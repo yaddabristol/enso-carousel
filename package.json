@@ -1,0 +1,24 @@
+{
+  "name": "enso-carousel",
+  "version": "1.0.0",
+  "description": "A renderless Vue component carousel.",
+  "main": "js/EnsoCarousel.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yaddabristol/enso-carousel.git"
+  },
+  "keywords": [
+    "carousel",
+    "vue",
+    "renderless"
+  ],
+  "author": "James Meechan <james@maya.agency>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/yaddabristol/enso-carousel/issues"
+  },
+  "homepage": "https://github.com/yaddabristol/enso-carousel#readme"
+}
