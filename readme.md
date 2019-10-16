@@ -37,28 +37,30 @@ MyCarousel.vue
       },
     ]"
   >
-    <div class="enso-carousel" slot-scope="{ prev, next, goto, isCurrentIndex, slides }">
-      <slide
-        class="enso-carousel__slide"
-        v-for="(slide, index) in slides"
-        :key="'slide' + index"
-        v-bind="slide"
-      ></slide>
+    <div slot-scope="{ prev, next, goto, isCurrentIndex, slides }">
+      <div class="enso-carousel__slides">
+        <slide
+          class="enso-carousel__slide"
+          v-for="(slide, index) in slides"
+          :key="'slide' + index"
+          v-bind="slide"
+        ></slide>
 
-      <button @click="prev">
-        Previous
-      </button>
-      <button @click="next">
-        Next
-      </button>
+        <button @click="prev">
+          Previous
+        </button>
+        <button @click="next">
+          Next
+        </button>
 
-      <ul>
-        <li v-for="(slide, index) in slides" :key="index">
-          <button @click="goto(index)" :class="{ 'is-active': isCurrentIndex(index) }">
-            {{ index }}
-          </button>
-        </li>
-      </ul>
+        <ul>
+          <li v-for="(slide, index) in slides" :key="index">
+            <button @click="goto(index)" :class="{ 'is-active': isCurrentIndex(index) }">
+              {{ index }}
+            </button>
+          </li>
+        </ul>
+      </div>
     </div>
   </enso-carousel>
 </template>
