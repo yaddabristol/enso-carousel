@@ -50,13 +50,13 @@ MyCarousel.vue
       <button @click="prev">
         Previous
       </button>
-      <button @click="next"    
+      <button @click="next">    
         Next
       </button>
 
       <ul>
         <li v-for="(slide, index) in slides" :key="index">
-          <button @click="goto(index)" :class="{ 'is-active': isCurrentIndex(index) }"
+          <button @click="goto(index)" :class="{ 'is-active': isCurrentIndex(index) }">
             {{ index }}
           </button>
         </li>
