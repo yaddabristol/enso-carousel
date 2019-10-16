@@ -44,23 +44,23 @@ MyCarousel.vue
           v-for="(slide, index) in slides"
           :key="'slide' + index"
           v-bind="slide"
-        ></slide>
-
-        <button @click="prev">
-          Previous
-        </button>
-        <button @click="next">
-          Next
-        </button>
-
-        <ul>
-          <li v-for="(slide, index) in slides" :key="index">
-            <button @click="goto(index)" :class="{ 'is-active': isCurrentIndex(index) }">
-              {{ index }}
-            </button>
-          </li>
-        </ul>
+        ></slide>  
       </div>
+
+      <button @click="prev">
+        Previous
+      </button>
+      <button @click="next"    
+        Next
+      </button>
+
+      <ul>
+        <li v-for="(slide, index) in slides" :key="index">
+          <button @click="goto(index)" :class="{ 'is-active': isCurrentIndex(index) }"
+            {{ index }}
+          </button>
+        </li>
+      </ul>
     </div>
   </enso-carousel>
 </template>
