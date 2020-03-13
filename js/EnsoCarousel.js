@@ -17,27 +17,39 @@ export default {
   },
 
   mounted() {
-    this.slides_container_el = this.$el.querySelector('.enso-carousel__slides');
-    this.slides_els = this.$el.querySelectorAll('.enso-carousel__slide');
-
+    this.containerEl = this.$el.querySelector('.enso-carousel__slides');
+    this.slidesEls = this.$el.querySelectorAll('.enso-carousel__slide');
+    this.linkDragging = false;
     this.allowShift = true;
     this.posX1 = 0;
     this.posX2 = 0;
     this.posInitial = null;
     this.posFinal = null;
-    this.slideWidth = this.slides_els[0].offsetWidth;
-    this.firstSlide = this.slides_els[0];
-    this.lastSlide = this.slides_els[this.slides.length - 1];
+    this.slideWidth = this.slidesEls[0].offsetWidth;
+    this.firstSlide = this.slidesEls[0];
+    this.lastSlide = this.slidesEls[this.slides.length - 1];
     this.cloneFirst = this.firstSlide.cloneNode(true);
     this.cloneLast = this.lastSlide.cloneNode(true);
-    this.slides_container_el.appendChild(this.cloneFirst);
-    this.slides_container_el.insertBefore(this.cloneLast, this.firstSlide);
-    this.slides_container_el.onmousedown = this.dragStart;
-    this.slides_container_el.addEventListener('touchstart', this.dragStart);
-    this.slides_container_el.addEventListener('touchend', this.dragEnd);
-    this.slides_container_el.addEventListener('touchmove', this.dragMove);
-    this.slides_container_el.addEventListener('transitionend', this.onTransitionEnd);
-    this.slides_container_el.addEventListener('webkitTransitionEnd', this.onTransitionEnd);
+    this.containerEl.appendChild(this.cloneFirst);
+    this.containerEl.insertBefore(this.cloneLast, this.firstSlide);
+    this.containerEl.onmousedown = this.dragStart;
+    this.containerEl.addEventListener('touchstart', this.dragStart);
+    this.containerEl.addEventListener('touchend', this.dragEnd);
+    this.containerEl.addEventListener('touchmove', this.dragMove);
+    this.containerEl.addEventListener('transitionend', this.onTransitionEnd);
+    this.containerEl.addEventListener('webkitTransitionEnd', this.onTransitionEnd);
+    this.containerEl.addEventListener('click', this.onClick);
+
+    this.links = this.containerEl.getElementsByTagName('a');
+
+    // Add a click handler to all links. Instead we will handle click events
+    // that bubble up to the container and inspect their originalTarget.
+    // This way we can have slides with links be draggable.
+    Array.from(this.links).forEach((link) => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+      });
+    });
 
     window.addEventListener('resize', this.onResize);
 
@@ -45,9 +57,17 @@ export default {
   },
 
   methods: {
+    onClick(e) {
+      console.log('click', e, this.linkDragging, e.originalTarget.tagName);
+      // If a link was clicked and not dragged, navigate to the link's href
+      if (e.originalTarget.tagName === 'A' && !this.linkDragging) {
+        window.location = e.originalTarget.href;
+      }
+    },
+
     onResize() {
-      this.slideWidth = this.slides_els[0].offsetWidth;
-      this.posInitial = this.slides_container_el.offsetLeft;
+      this.slideWidth = this.slidesEls[0].offsetWidth;
+      this.posInitial = this.containerEl.offsetLeft;
     },
 
     prev() {
@@ -59,9 +79,23 @@ export default {
     },
 
     dragStart(e) {
+      // By deafult links and images can be dragged around into a
+      // file browser or into the address bar. Instead of this we
+      // want to use our own drag logic so we'll disable this.
+      e.preventDefault();
+
+      // If we're dragging a link element then make a note of that so that we
+      // can handle click events. We need this value to persist after the
+      // dragend event has fired as the mouseup event that causes the click
+      // fires after the dragend. We'll only reset this to false if the
+      // drag didn't pass the threshold.
+      if (e.originalTarget.tagName === 'A') {
+        this.linkDragging = true;
+      }
+
       e = e || window.event;
       e.preventDefault;
-      this.posInitial = this.slides_container_el.offsetLeft;
+      this.posInitial = this.containerEl.offsetLeft;
 
       if (e.type === 'touchstart') {
         this.posX1 = e.touches[0].clientX;
@@ -85,20 +119,26 @@ export default {
         this.posX1 = e.clientX;
       }
 
-      this.slides_container_el.style.left = `${this.slides_container_el.offsetLeft - this.posX2}px`;
+      this.containerEl.style.left = `${this.containerEl.offsetLeft - this.posX2}px`;
 
       this.$emit('drag-move');
     },
 
     dragEnd(e) {
-      this.posFinal = this.slides_container_el.offsetLeft;
+      this.posFinal = this.containerEl.offsetLeft;
 
       if (this.posFinal - this.posInitial < -this.threshold) {
+        // We dragged to the left
         this.slideTo(1, 'drag');
       } else if (this.posFinal - this.posInitial > this.threshold) {
+        // We dragged to the right
         this.slideTo(-1, 'drag');
       } else {
-        this.slides_container_el.style.left = `${this.posInitial}px`;
+        // We didn't actually drag. Treat this as a click
+        this.linkDragging = false;
+
+        // Reset the left value to move the carousel back to initial position
+        this.containerEl.style.left = `${this.posInitial}px`;
       }
 
       document.onmouseup = null;
@@ -108,20 +148,18 @@ export default {
     },
 
     slideTo(direction, action) {
-      this.slides_container_el.classList.add('enso-carousel__slides--sliding');
+      this.containerEl.classList.add('enso-carousel__slides--sliding');
 
       if (this.allowShift) {
         if (!action) {
-          this.posInitial = this.slides_container_el.offsetLeft;
+          this.posInitial = this.containerEl.offsetLeft;
         }
 
         if (direction > 0) {
-          this.slides_container_el.style.left =
-            this.posInitial - this.slideWidth * direction + 'px';
+          this.containerEl.style.left = this.posInitial - this.slideWidth * direction + 'px';
           this.currentIndex = this.currentIndex + direction;
         } else if (direction < 0) {
-          this.slides_container_el.style.left =
-            this.posInitial - this.slideWidth * direction + 'px';
+          this.containerEl.style.left = this.posInitial - this.slideWidth * direction + 'px';
           this.currentIndex = this.currentIndex + direction;
         }
       }
@@ -135,15 +173,15 @@ export default {
     },
 
     onTransitionEnd() {
-      this.slides_container_el.classList.remove('enso-carousel__slides--sliding');
+      this.containerEl.classList.remove('enso-carousel__slides--sliding');
 
       if (this.currentIndex === -1) {
-        this.slides_container_el.style.left = `${-(this.slides.length * this.slideWidth)}px`;
+        this.containerEl.style.left = `${-(this.slides.length * this.slideWidth)}px`;
         this.currentIndex = this.slides.length - 1;
       }
 
       if (this.currentIndex === this.slides.length) {
-        this.slides_container_el.style.left = `${-(1 * this.slideWidth)}px`;
+        this.containerEl.style.left = `${-(1 * this.slideWidth)}px`;
         this.currentIndex = 0;
       }
 

@@ -44,13 +44,13 @@ MyCarousel.vue
           v-for="(slide, index) in slides"
           :key="'slide' + index"
           v-bind="slide"
-        ></slide>  
+        ></slide>
       </div>
 
       <button @click="prev">
         Previous
       </button>
-      <button @click="next">    
+      <button @click="next">
         Next
       </button>
 
@@ -95,6 +95,43 @@ export default {
   },
 };
 </script>
+```
+
+## Usage with links
+
+```vue
+<template>
+  <enso-carousel
+    :slides="[
+      {
+        content: 'This is my carousel. Here is the first slide.',
+        url: 'https://example.com',
+      },
+      {
+        content: 'This is the second slide.',
+        url: 'https://example.com',
+      },
+      {
+        content: 'And here is the third slide.',
+        url: 'https://example.com',
+      },
+    ]"
+  >
+    <div slot-scope="{ prev, next, goto, isCurrentIndex, slides }">
+      <div class="enso-carousel__slides">
+        <a
+          :href="slide.url"
+          class="enso-carousel__slide"
+          v-for="(slide, index) in slides"
+          :key="index"
+          v-bind="slide"
+        >
+          {{ slide.content }}
+        </a>
+      </div>
+    </div>
+  </enso-carousel>
+</template>
 ```
 
 ## Props
