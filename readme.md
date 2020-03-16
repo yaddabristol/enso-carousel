@@ -2,6 +2,10 @@
 
 A renderless Vue component carousel.
 
+## Limitations
+
+The carousel and its slides must be 100vw wide.
+
 ## Installation
 
 Use npm
@@ -153,7 +157,3 @@ export default {
 - next()
 - goto(index)
 - isCurrentIndex(index)
-
-## Limitations
-
-CSS limits the slides to being 100vw.

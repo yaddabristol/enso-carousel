@@ -1,14 +1,15 @@
 .enso-carousel {
   position: relative;
   overflow: hidden;
+  width: 100vw;
 
   &__slides {
     cursor: grab;
     display: flex;
     position: relative;
     top: 0;
+    min-width: 100vw;
     left: -100%;
-    width: 100000px;
     height: 100%;
 
     &--sliding {

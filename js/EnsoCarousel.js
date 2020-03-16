@@ -16,6 +16,12 @@ export default {
     };
   },
 
+  computed: {
+    totalSlideWidth() {
+      return (this.slides.length + 2) * 100 + 'vw';
+    },
+  },
+
   mounted() {
     this.containerEl = this.$el.querySelector('.enso-carousel__slides');
     this.slidesEls = this.$el.querySelectorAll('.enso-carousel__slide');
@@ -25,7 +31,6 @@ export default {
     this.posX2 = 0;
     this.posInitial = null;
     this.posFinal = null;
-    this.slideWidth = this.slidesEls[0].offsetWidth;
     this.firstSlide = this.slidesEls[0];
     this.lastSlide = this.slidesEls[this.slides.length - 1];
     this.cloneFirst = this.firstSlide.cloneNode(true);
@@ -39,7 +44,9 @@ export default {
     this.containerEl.addEventListener('transitionend', this.onTransitionEnd);
     this.containerEl.addEventListener('webkitTransitionEnd', this.onTransitionEnd);
     this.containerEl.addEventListener('click', this.onClick);
+    this.containerEl.style.width = this.totalSlideWidth;
 
+    this.slideWidth = this.slidesEls[0].offsetWidth;
     this.links = this.containerEl.getElementsByTagName('a');
 
     // Add a click handler to all links. Instead we will handle click events
@@ -58,7 +65,6 @@ export default {
 
   methods: {
     onClick(e) {
-      console.log('click', e, this.linkDragging, e.originalTarget.tagName);
       // If a link was clicked and not dragged, navigate to the link's href
       if (e.originalTarget.tagName === 'A' && !this.linkDragging) {
         window.location = e.originalTarget.href;
@@ -151,6 +157,8 @@ export default {
       this.containerEl.classList.add('enso-carousel__slides--sliding');
 
       if (this.allowShift) {
+        this.allowShift = false;
+
         if (!action) {
           this.posInitial = this.containerEl.offsetLeft;
         }
@@ -163,8 +171,6 @@ export default {
           this.currentIndex = this.currentIndex + direction;
         }
       }
-
-      this.allowShift = false;
     },
 
     goto(index) {
