@@ -98,7 +98,7 @@ export default {
         let closest_link = e.originalTarget.closest("a");
 
         if (closest_link) {
-          window.location = e.closest_link.href;
+          window.location = closest_link.href;
         }
       }
     },
