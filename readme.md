@@ -4,7 +4,8 @@ A renderless Vue component carousel.
 
 ## Limitations
 
-The carousel and its slides must be 100vw wide.
+* The carousel and its slides must be 100vw wide.
+* Slides must not be `<a>` elements. If you want to use an `<a>` then put it _inside_ the slide.
 
 ## Installation
 
@@ -123,15 +124,17 @@ export default {
   >
     <div slot-scope="{ prev, next, goto, isCurrentIndex, slides }">
       <div class="enso-carousel__slides">
-        <a
-          :href="slide.url"
-          class="enso-carousel__slide"
+        <div
           v-for="(slide, index) in slides"
           :key="index"
-          v-bind="slide"
         >
-          {{ slide.content }}
-        </a>
+          <a
+            :href="slide.url"
+            class="enso-carousel__slide"
+          >
+            {{ slide.content }}
+          </a>
+        </div>
       </div>
     </div>
   </enso-carousel>
