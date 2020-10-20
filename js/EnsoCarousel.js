@@ -120,7 +120,9 @@ export default {
       // By deafult links and images can be dragged around into a
       // file browser or into the address bar. Instead of this we
       // want to use our own drag logic so we'll disable this.
-      e.preventDefault();
+      if (e.type !== 'touchstart') {
+        e.preventDefault();
+      }
 
       // If we're dragging a link element then make a note of that so that we
       // can handle click events. We need this value to persist after the
