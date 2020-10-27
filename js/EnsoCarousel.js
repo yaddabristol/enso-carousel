@@ -53,7 +53,7 @@ export default {
     this.links = this.containerEl.getElementsByTagName("a");
 
     // Add a click handler to all links. Instead we will handle click events
-    // that bubble up to the container and inspect their originalTarget.
+    // that bubble up to the container and inspect their target.
     // This way we can have slides with links be draggable.
     Array.from(this.links).forEach(link => {
       link.addEventListener("click", e => {
@@ -90,12 +90,13 @@ export default {
     onClick(e) {
       // If a link was clicked and not dragged, navigate to the link's href
       if (!this.linkDragging) {
-        if (e.originalTarget.tagName === "A") {
-          window.location = e.originalTarget.href;
+        if (e.target.tagName === "A") {
+          window.location = e.target.href;
+          return;
         }
 
         // This is also handles, e.g. clicking an image within a link.
-        let closest_link = e.originalTarget.closest("a");
+        let closest_link = e.target.closest("a");
 
         if (closest_link) {
           window.location = closest_link.href;
@@ -129,7 +130,7 @@ export default {
       // dragend event has fired as the mouseup event that causes the click
       // fires after the dragend. We'll only reset this to false if the
       // drag didn't pass the threshold.
-      if (this.isTargetWithinSlide(e.originalTarget)) {
+      if (this.isTargetWithinSlide(e.target)) {
         this.linkDragging = true;
       }
 
