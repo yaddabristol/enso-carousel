@@ -2,30 +2,31 @@ export default {
   props: {
     threshold: {
       type: Number,
-      default: 100
+      default: 100,
     },
     slides: {
       type: Array,
-      required: []
-    }
+      required: [],
+    },
   },
 
   data() {
     return {
-      currentIndex: 0
+      currentIndex: 0,
     };
   },
 
   computed: {
     totalSlideWidth() {
-      return (this.slides.length + 2) * 100 + "vw";
-    }
+      return (this.slides.length + 2) * 100 + 'vw';
+    },
   },
 
   mounted() {
-    this.containerEl = this.$el.querySelector(".enso-carousel__slides");
-    this.slidesEls = this.$el.querySelectorAll(".enso-carousel__slide");
+    this.containerEl = this.$el.querySelector('.enso-carousel__slides');
+    this.slidesEls = this.$el.querySelectorAll('.enso-carousel__slide');
     this.linkDragging = false;
+    this.dragging = false;
     this.allowShift = true;
     this.posX1 = 0;
     this.posX2 = 0;
@@ -38,40 +39,35 @@ export default {
     this.containerEl.appendChild(this.cloneFirst);
     this.containerEl.insertBefore(this.cloneLast, this.firstSlide);
     this.containerEl.onmousedown = this.dragStart;
-    this.containerEl.addEventListener("touchstart", this.dragStart);
-    this.containerEl.addEventListener("touchend", this.dragEnd);
-    this.containerEl.addEventListener("touchmove", this.dragMove);
-    this.containerEl.addEventListener("transitionend", this.onTransitionEnd);
-    this.containerEl.addEventListener(
-      "webkitTransitionEnd",
-      this.onTransitionEnd
-    );
-    this.containerEl.addEventListener("click", this.onClick);
+    this.containerEl.addEventListener('touchstart', this.dragStart);
+    this.containerEl.addEventListener('touchend', this.dragEnd);
+    this.containerEl.addEventListener('touchmove', this.dragMove);
+    this.containerEl.addEventListener('transitionend', this.onTransitionEnd);
+    this.containerEl.addEventListener('webkitTransitionEnd', this.onTransitionEnd);
+    this.containerEl.addEventListener('click', this.onClick);
     this.containerEl.style.width = this.totalSlideWidth;
 
     this.slideWidth = this.slidesEls[0].offsetWidth;
-    this.links = this.containerEl.getElementsByTagName("a");
+    this.links = this.containerEl.getElementsByTagName('a');
 
     // Add a click handler to all links. Instead we will handle click events
     // that bubble up to the container and inspect their target.
     // This way we can have slides with links be draggable.
-    Array.from(this.links).forEach(link => {
-      link.addEventListener("click", e => {
+    Array.from(this.links).forEach((link) => {
+      link.addEventListener('click', (e) => {
         e.preventDefault();
       });
     });
 
-    Array.from(document.querySelectorAll(".enso-carousel__slide *")).forEach(
-      el => {
-        el.addEventListener("click", e => {
-          e.preventDefault();
-        });
-      }
-    );
+    Array.from(document.querySelectorAll('.enso-carousel__slide *')).forEach((el) => {
+      el.addEventListener('click', (e) => {
+        e.preventDefault();
+      });
+    });
 
-    window.addEventListener("resize", this.onResize);
+    window.addEventListener('resize', this.onResize);
 
-    this.$emit("ready", this.slides[0]);
+    this.$emit('ready', this.slides[0]);
   },
 
   methods: {
@@ -90,13 +86,13 @@ export default {
     onClick(e) {
       // If a link was clicked and not dragged, navigate to the link's href
       if (!this.linkDragging) {
-        if (e.target.tagName === "A") {
+        if (e.target.tagName === 'A') {
           window.location = e.target.href;
           return;
         }
 
         // This is also handles, e.g. clicking an image within a link.
-        let closest_link = e.target.closest("a");
+        let closest_link = e.target.closest('a');
 
         if (closest_link) {
           window.location = closest_link.href;
@@ -118,6 +114,15 @@ export default {
     },
 
     dragStart(e) {
+      if (this.dragging) {
+        return;
+      }
+
+      // This is to prevent multiple dragstart events being called before
+      // a drag has completed. If that happens then the posInitial gets out of
+      // whack and we end up half on one slide and half on another
+      this.dragging = true;
+
       // By deafult links and images can be dragged around into a
       // file browser or into the address bar. Instead of this we
       // want to use our own drag logic so we'll disable this.
@@ -136,9 +141,10 @@ export default {
 
       e = e || window.event;
       e.preventDefault;
+
       this.posInitial = this.containerEl.offsetLeft;
 
-      if (e.type === "touchstart") {
+      if (e.type === 'touchstart') {
         this.posX1 = e.touches[0].clientX;
       } else {
         this.posX1 = e.clientX;
@@ -146,13 +152,13 @@ export default {
         document.onmousemove = this.dragMove;
       }
 
-      this.$emit("drag-start");
+      this.$emit('drag-start');
     },
 
     dragMove(e) {
       e = e || window.event;
 
-      if (e.type === "touchmove") {
+      if (e.type === 'touchmove') {
         this.posX2 = this.posX1 - e.touches[0].clientX;
         this.posX1 = e.touches[0].clientX;
       } else {
@@ -160,10 +166,9 @@ export default {
         this.posX1 = e.clientX;
       }
 
-      this.containerEl.style.left = `${this.containerEl.offsetLeft -
-        this.posX2}px`;
+      this.containerEl.style.left = `${this.containerEl.offsetLeft - this.posX2}px`;
 
-      this.$emit("drag-move");
+      this.$emit('drag-move');
     },
 
     dragEnd(e) {
@@ -171,10 +176,10 @@ export default {
 
       if (this.posFinal - this.posInitial < -this.threshold) {
         // We dragged to the left
-        this.slideTo(1, "drag");
+        this.slideTo(1, 'drag');
       } else if (this.posFinal - this.posInitial > this.threshold) {
         // We dragged to the right
-        this.slideTo(-1, "drag");
+        this.slideTo(-1, 'drag');
       } else {
         // We didn't actually drag. Treat this as a click
         this.linkDragging = false;
@@ -186,11 +191,11 @@ export default {
       document.onmouseup = null;
       document.onmousemove = null;
 
-      this.$emit("drag-end");
+      this.$emit('drag-end');
     },
 
     slideTo(direction, action) {
-      this.containerEl.classList.add("enso-carousel__slides--sliding");
+      this.containerEl.classList.add('enso-carousel__slides--sliding');
 
       if (this.allowShift) {
         this.allowShift = false;
@@ -200,12 +205,10 @@ export default {
         }
 
         if (direction > 0) {
-          this.containerEl.style.left =
-            this.posInitial - this.slideWidth * direction + "px";
+          this.containerEl.style.left = this.posInitial - this.slideWidth * direction + 'px';
           this.currentIndex = this.currentIndex + direction;
         } else if (direction < 0) {
-          this.containerEl.style.left =
-            this.posInitial - this.slideWidth * direction + "px";
+          this.containerEl.style.left = this.posInitial - this.slideWidth * direction + 'px';
           this.currentIndex = this.currentIndex + direction;
         }
       }
@@ -217,12 +220,11 @@ export default {
     },
 
     onTransitionEnd() {
-      this.containerEl.classList.remove("enso-carousel__slides--sliding");
+      this.dragging = false;
+      this.containerEl.classList.remove('enso-carousel__slides--sliding');
 
       if (this.currentIndex === -1) {
-        this.containerEl.style.left = `${-(
-          this.slides.length * this.slideWidth
-        )}px`;
+        this.containerEl.style.left = `${-(this.slides.length * this.slideWidth)}px`;
         this.currentIndex = this.slides.length - 1;
       }
 
@@ -231,7 +233,7 @@ export default {
         this.currentIndex = 0;
       }
 
-      this.$emit("change", this.slides[this.currentIndex]);
+      this.$emit('change', this.slides[this.currentIndex]);
 
       this.allowShift = true;
     },
@@ -241,15 +243,12 @@ export default {
         return true;
       } else if (index === 0 && this.currentIndex === -1) {
         return true;
-      } else if (
-        index === this.slides.length - 1 &&
-        this.currentIndex === this.slides.length
-      ) {
+      } else if (index === this.slides.length - 1 && this.currentIndex === this.slides.length) {
         return true;
       } else {
         return false;
       }
-    }
+    },
   },
 
   render() {
@@ -258,7 +257,7 @@ export default {
       next: this.next,
       goto: this.goto,
       isCurrentIndex: this.isCurrentIndex,
-      slides: this.slides
+      slides: this.slides,
     });
-  }
+  },
 };
