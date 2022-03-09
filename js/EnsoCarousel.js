@@ -159,6 +159,9 @@ export default {
       e = e || window.event;
 
       if (e.type === 'touchmove') {
+        if (Math.abs(e.touches[0].clientX - this.posX1) > 5 && e.cancelable) {
+          e.preventDefault();
+        }
         this.posX2 = this.posX1 - e.touches[0].clientX;
         this.posX1 = e.touches[0].clientX;
       } else {
