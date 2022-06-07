@@ -118,6 +118,12 @@ export default {
         return;
       }
 
+      // Ignore right clicks
+      if (e.button === 2) {
+        e.preventDefault();
+        return;
+      }
+
       // This is to prevent multiple dragstart events being called before
       // a drag has completed. If that happens then the posInitial gets out of
       // whack and we end up half on one slide and half on another
