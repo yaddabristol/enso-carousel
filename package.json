@@ -1,6 +1,6 @@
 {
   "name": "enso-carousel",
-  "version": "2.0.8",
+  "version": "2.0.9",
   "description": "A renderless Vue component carousel.",
   "main": "js/EnsoCarousel.js",
   "scripts": {
