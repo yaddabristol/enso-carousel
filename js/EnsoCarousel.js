@@ -103,6 +103,7 @@ export default {
     onResize() {
       this.slideWidth = this.slidesEls[0].offsetWidth;
       this.posInitial = this.containerEl.offsetLeft;
+      this.containerEl.style.left = `${-(this.slides.length * this.slideWidth)}px`;
     },
 
     prev() {
